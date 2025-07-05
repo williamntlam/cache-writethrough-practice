@@ -1,0 +1,7 @@
+FROM redis:alpine
+
+EXPOSE 6379
+
+CMD ["redis-server"]
+
+# Can also just pull the official redis image w/ docker pull redis:alpine.
