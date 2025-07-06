@@ -2,34 +2,37 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"github.com/gin-gonic/gin"
+	redisdb "github.com/redis/go-redis/v9"
 	"cache-writethrough-practice/postgres"
 	"cache-writethrough-practice/redis"
 )
 
 var ctx = context.Background()
+var db *sql.DB
+var redisClient *redisdb.Client
 
 func main() {
 
 	router := gin.Default()
 
-	db, err := postgres.ConnectToPostgres()
+	var err error
+	db, err = postgres.ConnectToPostgres()
 
 	if err != nil {
 		log.Fatal("Failed to connect to PostgreSQL:", err)
-		os.Exit(1);
 	} 
 
 	defer db.Close()
 	fmt.Println("Connected to Postgres");
 
-	redisClient, err := redis.ConnectToRedis()
+	redisClient, err = redis.ConnectToRedis()
 
 	if err != nil {
 		log.Fatal("Failed to connect to Redis:", err)
-		os.Exit(1);
 	}
 
 	defer redisClient.Close()

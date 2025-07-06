@@ -1,20 +1,20 @@
-package redisdb
+package redis
 
 import (
     "context"
     "fmt"
     "os"
-
+    
     "github.com/joho/godotenv"
     "github.com/redis/go-redis/v9"
 )
 
 func ConnectToRedis() (*redis.Client, error) {
     // Load environment variables
-    err := godotenv.Load("./redis/.env")
+    err := godotenv.Load("../redis/.env")
 
 	if err != nil {
-		fmt.Println("Warning: No .env file found in ./postgres/.env")
+		fmt.Println("Warning: No .env file found for Redis.")
 	}
 
     host := os.Getenv("REDIS_HOST")
