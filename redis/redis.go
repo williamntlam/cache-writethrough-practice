@@ -11,7 +11,11 @@ import (
 
 func ConnectToRedis() (*redis.Client, error) {
     // Load environment variables
-    _ = godotenv.Load()
+    err := godotenv.Load("./redis/.env")
+
+	if err != nil {
+		fmt.Println("Warning: No .env file found in ./postgres/.env")
+	}
 
     host := os.Getenv("REDIS_HOST")
     port := os.Getenv("REDIS_PORT")

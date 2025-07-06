@@ -10,6 +10,12 @@ import (
 
 func ConnectToPostgres() (*sql.DB, error) {
 
+	err := godotenv.Load("./postgres/.env")
+
+	if err != nil {
+		fmt.Println("Warning: No .env file found in ./postgres/.env")
+	}
+
 	host := os.Getenv("POSTGRES_HOST")
 	port := os.Getenv("POSTGRES_PORT")
 	user := os.Getenv("POSTGRES_USER")
