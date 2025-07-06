@@ -1,34 +1,33 @@
+package redisdb
+
 import (
     "context"
     "fmt"
+    "os"
+
+    "github.com/joho/godotenv"
     "github.com/redis/go-redis/v9"
-	"github.com/joho/godotenv"
 )
 
-var RedisDatabase *redis.Client
+func ConnectToRedis() (*redis.Client, error) {
+    // Load environment variables
+    _ = godotenv.Load()
 
-func connectToRedis() {
+    host := os.Getenv("REDIS_HOST")
+    port := os.Getenv("REDIS_PORT")
 
-	godotenv.Load()
-	host := os.Getenv("REDIS_HOST")
-	port := os.Getenv("REDIS_PORT")
+    rdb := redis.NewClient(&redis.Options{
+        Addr:     fmt.Sprintf("%s:%s", host, port),
+        Password: os.Getenv("REDIS_PASSWORD"), // optional
+        DB:       0, // default DB
+    })
 
-	RedisDatabase = redis.NewClient(&redis.Options{
+    // Test the connection
+    pong, err := rdb.Ping(context.Background()).Result()
+    if err != nil {
+        return nil, fmt.Errorf("failed to connect to Redis: %w", err)
+    }
 
-		Addr:     fmt.Sprintf("%s:%s", host, port),
-        Password: "", // or os.Getenv("REDIS_PASSWORD")
-        DB:       0,  // default DB
-
-	})
-
-	_, error = RedisDatabase.Ping(context.Background()).Result()
-
-	if error != nil {
-
-		panic("Failed to connect to Redis: " + error.Error())
-
-	}
-
-	fmt.Println("Connected to Redis")
-
+    fmt.Println("Redis connected:", pong)
+    return rdb, nil
 }
