@@ -7,11 +7,6 @@ import (
 	"net/http"
 )
 
-type Todo struct {
-	ID string `json:"id"`
-	Title string `json:"title`
-}
-
 var ctx = context.Background()
 
 func main() {
