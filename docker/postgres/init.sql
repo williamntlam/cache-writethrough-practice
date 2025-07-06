@@ -1,4 +1,4 @@
-CREATE TABLE Todos (
+CREATE TABLE Tasks (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL
 )

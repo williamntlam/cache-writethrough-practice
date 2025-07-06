@@ -57,6 +57,25 @@ func main() {
 		})
 	})
 
+	router.GET("/tasks", func(context *gin.Context) {
+
+		tasks, error := db.Query("SELECT * from Tasks")
+
+		if error != nil {
+			log.Fatal("Query failed.", error)
+		}
+
+		context.JSON(200, gin.H{
+			"tasks": tasks,
+		})
+	})
+
+	router.POST("/tasks", func(context *gin.Context) {
+
+		
+
+	})
+
 	router.Run()
 
 }
