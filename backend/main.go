@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/redis/go-redis/v9"
 	"net/http"
+	"cache-writethrough-practice/postgres"
+	"cache-writethrough-practice/redis"
 )
 
 var ctx = context.Background()
@@ -18,6 +20,8 @@ func main() {
 	// GET - get all tasks.
 	// PUT/PATCH - update a task
 	// DELETE - delete a task
+
+	
 
 	router.Run()
 
