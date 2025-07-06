@@ -44,9 +44,16 @@ func main() {
 	// PUT/PATCH - update a task
 	// DELETE - delete a task
 
-	router.GET("/ping", func(context *gin.Context) {
+	router.GET("/tasks", func(context *gin.Context) {
+
+		tasks, error := db.Query("SELECT * from Tasks")
+
+		if error != nil {
+			log.Fatal("Query failed.", error)
+		}
+
 		context.JSON(200, gin.H{
-			"message": "pong",
+			"tasks": tasks,
 		})
 	})
 
