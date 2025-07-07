@@ -9,6 +9,7 @@ import (
 	redisdb "github.com/redis/go-redis/v9"
 	"cache-writethrough-practice/postgres"
 	"cache-writethrough-practice/redis"
+	"cache-writethrough-practice/types"
 )
 
 var ctx = context.Background()
@@ -46,23 +47,33 @@ func main() {
 
 	router.GET("/tasks", func(context *gin.Context) {
 
-		tasks, error := db.Query("SELECT * from Tasks")
+		rows, err := db.Query("SELECT id, title FROM Tasks")
 
-		if error != nil {
-			log.Fatal("Query failed.", error)
+		if err != nil {
+			log.Printf("Query failed: %v", err)
+			context.JSON(500, gin.H{"error": "Failed to fetch tasks"})
+			return
+		}
+		defer rows.Close()
+
+		var tasks []gin.H
+		for rows.Next() {
+			var id int
+			var title string
+			if err := rows.Scan(&id, &title); err != nil {
+				log.Printf("Error scanning row: %v", err)
+				continue
+			}
+			tasks = append(tasks, gin.H{
+				"id":    id,
+				"title": title,
+			})
 		}
 
-		context.JSON(200, gin.H{
-			"tasks": tasks,
-		})
-	})
-
-	router.GET("/tasks", func(context *gin.Context) {
-
-		tasks, error := db.Query("SELECT * from Tasks")
-
-		if error != nil {
-			log.Fatal("Query failed.", error)
+		if err = rows.Err(); err != nil {
+			log.Printf("Error iterating rows: %v", err)
+			context.JSON(500, gin.H{"error": "Failed to process tasks"})
+			return
 		}
 
 		context.JSON(200, gin.H{
@@ -72,7 +83,29 @@ func main() {
 
 	router.POST("/tasks", func(context *gin.Context) {
 
-		
+		var request types.CreateTaskRequest
+
+		if err := context.ShouldBindJSON(&request); err != nil {
+			context.JSON(400, gin.H{"error": err.Error()})
+			return
+		}
+
+		var taskID int
+
+		// write to the postgres database next.
+		err := db.QueryRow(`INSERT INTO Tasks(title) VALUES($1) RETURNING id`, request.Title).Scan(&taskID)
+
+		if err != nil {
+			context.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+
+		context.JSON(201, gin.H{
+			"message": "Task created successfully",
+			"task_id": taskID,
+		})
+
+		// write to the redis cache next.
 
 	})
 
