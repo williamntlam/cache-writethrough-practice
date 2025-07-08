@@ -122,18 +122,26 @@ func main() {
 			context.JSON(400, gin.H{"error": "Invalid task ID"})
 			return
 		}
+
+		key := fmt.Sprintf("task:%d", taskID)
+
+		result, err := redisClient.HGetAll(ctx, key).Result()
+
+		if err != nil {
+			context.JSON(400, gin.H{"error": "Redis Error"})
+			return
+		} 
 	
-		var id int
-		var title string
-		err := db.QueryRow("SELECT id, title FROM Tasks WHERE id = $1", taskID).Scan(&id, &title)
-		if err == sql.ErrNoRows {
+		if len(result) == 0 {
+
 			context.JSON(404, gin.H{"error": "Task not found"})
 			return
-		} else if err != nil {
-			context.JSON(500, gin.H{"error": "Failed to fetch task"})
-			return
+
 		}
-	
+
+		id := result["id"]
+		title := result["title"]
+
 		context.JSON(200, gin.H{
 			"id":    id,
 			"title": title,
