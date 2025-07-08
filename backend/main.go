@@ -195,12 +195,24 @@ func main() {
 			return
 		}
 
+		// write to the redis cache next.
+		// request.Title
+		// taskID
+
+		err = redisClient.HSet(ctx, fmt.Sprintf("task:%d", taskID), map[string]interface{}{
+			"id": taskID,
+			"title": request.Title,
+		}).Err()
+
+		if err != nil {
+			context.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+
 		context.JSON(201, gin.H{
 			"message": "Task created successfully",
 			"task_id": taskID,
 		})
-
-		// write to the redis cache next.
 
 	})
 
