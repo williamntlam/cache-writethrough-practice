@@ -45,6 +45,42 @@ func main() {
 	// PUT/PATCH - update a task
 	// DELETE - delete a task
 
+	router.DELETE("/tasks/:id", func(context *gin.Context) {
+
+		taskIDStr := context.Param("id");
+		
+		var taskID int
+		if _, err := fmt.Sscanf(taskIDStr, "%d", &taskID); err != nil {
+			context.JSON(400, gin.H{"error": "Invalid task ID"})
+			return
+		}
+
+		result, err := db.Exec(`DELETE from Tasks where id = $1`, taskID)
+
+		if err != nil {
+			fmt.Println("Delete Failed: %v", err)
+			context.JSON(500, gin.H{"error": "Failed to delete task"})
+			return
+		}
+
+		rowsAffected, err := result.RowsAffected()
+
+		if err != nil {
+			log.Printf("Error getting rows affected: %v", err)
+			context.JSON(500, gin.H{"error": "Failed to delete task"})
+			return
+		}
+
+		if rowsAffected == 0 {
+			context.JSON(404, gin.H{"error": "Task not found"})
+			return
+		}
+
+		context.JSON(200, gin.H{"message": "Task deleted successfully"})
+
+	})
+
+
 	router.GET("/tasks", func(context *gin.Context) {
 
 		rows, err := db.Query("SELECT id, title FROM Tasks")

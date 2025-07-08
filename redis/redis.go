@@ -11,7 +11,7 @@ import (
 
 func ConnectToRedis() (*redis.Client, error) {
     // Load environment variables
-    err := godotenv.Load("../redis/.env")
+    err := godotenv.Load("./redis/.env")
 
 	if err != nil {
 		fmt.Println("Warning: No .env file found for Redis.")

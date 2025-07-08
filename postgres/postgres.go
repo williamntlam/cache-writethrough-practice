@@ -11,7 +11,7 @@ import (
 
 func ConnectToPostgres() (*sql.DB, error) {
 
-	err := godotenv.Load("../postgres/.env")
+	err := godotenv.Load("./postgres/.env")
 
 	if err != nil {
 		fmt.Println("Warning: No .env file found for Postgres.")
