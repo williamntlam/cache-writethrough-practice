@@ -78,6 +78,14 @@ func main() {
 			return
 		}
 	
+		key := fmt.Sprintf("task:%d", taskID)
+		err = redisClient.HSet(ctx, key, "title", request.Title).Err()
+
+		if err != nil {
+			context.JSON(404, gin.H{"error": "Task could not be updated in the Redis cache."})
+			return
+		}
+
 		context.JSON(200, gin.H{"message": "Task updated successfully"})
 	})
 
