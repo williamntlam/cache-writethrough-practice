@@ -40,7 +40,6 @@ func main() {
 	fmt.Println("Connected to Redis")
 
 	// POST - create a task
-	// GET - get a task
 	// GET - get all tasks.
 	// PUT/PATCH - update a task
 	// DELETE - delete a task
