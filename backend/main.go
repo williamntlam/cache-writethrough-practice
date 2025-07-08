@@ -115,6 +115,30 @@ func main() {
 
 	})
 
+	router.GET("/tasks/:id", func(context *gin.Context) {
+		taskIDStr := context.Param("id")
+		var taskID int
+		if _, err := fmt.Sscanf(taskIDStr, "%d", &taskID); err != nil {
+			context.JSON(400, gin.H{"error": "Invalid task ID"})
+			return
+		}
+	
+		var id int
+		var title string
+		err := db.QueryRow("SELECT id, title FROM Tasks WHERE id = $1", taskID).Scan(&id, &title)
+		if err == sql.ErrNoRows {
+			context.JSON(404, gin.H{"error": "Task not found"})
+			return
+		} else if err != nil {
+			context.JSON(500, gin.H{"error": "Failed to fetch task"})
+			return
+		}
+	
+		context.JSON(200, gin.H{
+			"id":    id,
+			"title": title,
+		})
+	})
 
 	router.GET("/tasks", func(context *gin.Context) {
 
