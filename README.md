@@ -44,7 +44,7 @@ A simple task management application built with **Go (Gin)**, **Angular**, and *
 ### 1. Clone and Setup
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/williamntlam/cache-writethrough-practice
 cd cache-writethrough-practice
 ```
 
