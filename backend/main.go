@@ -150,33 +150,28 @@ func main() {
 
 	router.GET("/tasks", func(context *gin.Context) {
 
-		rows, err := db.Query("SELECT id, title FROM Tasks")
+		keys, err := redisClient.Keys(ctx, "task:*").Result()
 
 		if err != nil {
 			log.Printf("Query failed: %v", err)
 			context.JSON(500, gin.H{"error": "Failed to fetch tasks"})
 			return
 		}
-		defer rows.Close()
 
 		tasks := make([]gin.H, 0)
-		for rows.Next() {
-			var id int
-			var title string
-			if err := rows.Scan(&id, &title); err != nil {
-				log.Printf("Error scanning row: %v", err)
-				continue
-			}
-			tasks = append(tasks, gin.H{
-				"id":    id,
-				"title": title,
-			})
-		}
+		for _, key := range keys {
+			task, err := redisClient.HGetAll(ctx, key).Result()
 
-		if err = rows.Err(); err != nil {
-			log.Printf("Error iterating rows: %v", err)
-			context.JSON(500, gin.H{"error": "Failed to process tasks"})
-			return
+			if err != nil {
+				log.Printf("Error processing tasks: %v", err)
+				context.JSON(500, gin.H{"error": "Failed to process tasks"})
+				return
+			}
+
+			if len(task) > 0 {
+				tasks = append(tasks, gin.H(task))
+			}
+
 		}
 
 		context.JSON(200, gin.H{
