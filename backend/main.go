@@ -39,9 +39,10 @@ func main() {
 	defer redisClient.Close()
 	fmt.Println("Connected to Redis")
 
-	// POST - create a task
-	// GET - get all tasks.
-	// PUT/PATCH - update a task
+	// POST - create a task - uses cache
+	// GET - get all tasks. - uses cache
+	// GET - get a specific task - uses cache
+	// PATCH - update a task
 	// DELETE - delete a task
 
 	router.PATCH("/tasks/:id", func(context *gin.Context) {
@@ -108,6 +109,16 @@ func main() {
 
 		if rowsAffected == 0 {
 			context.JSON(404, gin.H{"error": "Task not found"})
+			return
+		}
+
+		// Delete task from the Redis cache.
+
+		key := fmt.Sprintf("task:%d", taskID)
+		err = redisClient.Del(ctx, key).Err()
+
+		if err != nil {
+			context.JSON(400, gin.H{"error": "Task not found in the Redis Cache"})
 			return
 		}
 
