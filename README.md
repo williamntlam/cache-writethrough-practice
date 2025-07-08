@@ -1,6 +1,6 @@
 # Go Practice: Writethrough Caching System
 
-A simple task management application built with **Go (Gin)**, **Angular**, and **Redis** to practice implementing a writethrough caching system.
+A simple task management application built with **Go (Gin)**, **Angular**, and **Redis** to practice implementing caching systems. Later on, this application will allow for multiple caching techniques and cache invalidation techniques that the user can set.
 
 ## 🎯 Learning Objectives
 
