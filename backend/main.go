@@ -45,6 +45,42 @@ func main() {
 	// PUT/PATCH - update a task
 	// DELETE - delete a task
 
+	router.PATCH("/tasks/:id", func(context *gin.Context) {
+		taskIDStr := context.Param("id")
+
+		var request types.TaskRequest
+		
+		var taskID int
+		if _, err := fmt.Sscanf(taskIDStr, "%d", &taskID); err != nil {
+			context.JSON(400, gin.H{"error": "Invalid task ID"})
+			return
+		}
+	
+		if err := context.ShouldBindJSON(&request); err != nil {
+			context.JSON(400, gin.H{"error": err.Error()})
+			return
+		}
+	
+		result, err := db.Exec(`UPDATE Tasks SET title = $1 WHERE id = $2`, request.Title, taskID)
+		if err != nil {
+			context.JSON(500, gin.H{"error": "Failed to update task"})
+			return
+		}
+	
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			context.JSON(500, gin.H{"error": "Failed to update task"})
+			return
+		}
+	
+		if rowsAffected == 0 {
+			context.JSON(404, gin.H{"error": "Task not found"})
+			return
+		}
+	
+		context.JSON(200, gin.H{"message": "Task updated successfully"})
+	})
+
 	router.DELETE("/tasks/:id", func(context *gin.Context) {
 
 		taskIDStr := context.Param("id");
@@ -119,7 +155,7 @@ func main() {
 
 	router.POST("/tasks", func(context *gin.Context) {
 
-		var request types.CreateTaskRequest
+		var request types.TaskRequest
 
 		if err := context.ShouldBindJSON(&request); err != nil {
 			context.JSON(400, gin.H{"error": err.Error()})

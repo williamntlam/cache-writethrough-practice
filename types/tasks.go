@@ -5,7 +5,7 @@ type Todo struct {
 	Title string `json:"title"`
 }
 
-type CreateTaskRequest struct {
+type TaskRequest struct {
 	Title string `json:"title" binding:"required"`
 }
 
