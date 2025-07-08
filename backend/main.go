@@ -127,7 +127,7 @@ func main() {
 		}
 		defer rows.Close()
 
-		var tasks []gin.H
+		tasks := make([]gin.H, 0)
 		for rows.Next() {
 			var id int
 			var title string
